@@ -15,16 +15,22 @@ const Login = () => {
 
     useEffect(() => {
         /* global google */
-        if (window.google) {
-            google.accounts.id.initialize({
-                client_id: GOOGLE_CLIENT_ID,
-                callback: handleGoogleResponse
-            });
-            google.accounts.id.renderButton(
-                document.getElementById("googleBtn"),
-                { theme: "outline", size: "large", width: 350 } // Numeric width in pixels
-            );
-        }
+        const initGoogle = () => {
+            if (window.google) {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleResponse
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("googleBtn"),
+                    { theme: "outline", size: "large", width: 350 }
+                );
+            }
+        };
+
+        // Small timeout to ensure script is loaded and DOM is ready
+        const timer = setTimeout(initGoogle, 100);
+        return () => clearTimeout(timer);
     }, [isRegister]);
 
     const handleGoogleResponse = async (response) => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,6 +9,43 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
+
+    // Replace this with your actual Google Client ID
+    const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com";
+
+    useEffect(() => {
+        /* global google */
+        if (window.google) {
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleResponse
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("googleBtn"),
+                { theme: "outline", size: "large", width: "100%" }
+            );
+        }
+    }, [isRegister]);
+
+    const handleGoogleResponse = async (response) => {
+        try {
+            const res = await fetch(`http://localhost:5221/api/auth/google`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: response.credential })
+            });
+            const data = await res.json();
+            if (data.token) {
+                login(data.user, data.token);
+                navigate('/');
+            } else {
+                alert(data.message || "Google login failed");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Google login error");
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -43,11 +80,6 @@ const Login = () => {
             console.error(err);
             alert("Server not reachable");
         }
-    };
-
-    const handleGoogleLogin = () => {
-        // Redirect to your backend's Google Auth endpoint
-        window.location.href = 'http://localhost:5221/api/auth/google-login';
     };
 
     return (
@@ -89,10 +121,8 @@ const Login = () => {
                     <span>OR</span>
                 </div>
 
-                <button onClick={handleGoogleLogin} className="google-btn">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Reference_icon.svg" alt="Google" width="18" />
-                    Sign in with Google
-                </button>
+                {/* Google Sign-In Button Container */}
+                <div id="googleBtn" style={{ width: '100%' }}></div>
 
                 <p className="toggle-text">
                     {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
@@ -101,7 +131,6 @@ const Login = () => {
                     </span>
                 </p>
             </div>
-
         </div>
     );
 };

@@ -94,8 +94,8 @@ const Dashboard = () => {
                                     <span className="chat-item-name">{partnerEmail}</span>
                                     <span className="chat-item-last-msg">{c.LastMessage || c.lastMessage || 'No messages yet'}</span>
                                 </div>
-                                {unreadCounts[c.User] > 0 && (
-                                    <span className="badge">{unreadCounts[c.User]}</span>
+                                {unreadCounts[partnerEmail] > 0 && (
+                                    <span className="badge">{unreadCounts[partnerEmail]}</span>
                                 )}
                             </div>
                         );

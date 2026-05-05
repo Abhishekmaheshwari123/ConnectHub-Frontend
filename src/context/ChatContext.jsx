@@ -58,18 +58,20 @@ export const ChatProvider = ({ children }) => {
             });
 
             connection.on("MessageDelivered", (data) => {
-                setMessages(prev => prev.map(m => m.id === data.id ? { ...m, status: "Delivered" } : m));
+                const mid = data.id || data.Id;
+                setMessages(prev => prev.map(m => (m.id || m.Id) === mid ? { ...m, status: "Delivered", Status: "Delivered" } : m));
             });
 
             connection.on("MessagesSeen", (ids) => {
-                setMessages(prev => prev.map(m => ids.includes(m.id) ? { ...m, status: "Seen" } : m));
+                setMessages(prev => prev.map(m => ids.includes(m.id || m.Id) ? { ...m, status: "Seen", Status: "Seen" } : m));
             });
 
             connection.on("ReceiveNotification", (data) => {
-                if (activePartner !== data.from) {
+                const from = (data.from || data.From).toLowerCase();
+                if (activePartner?.toLowerCase() !== from) {
                     setUnreadCounts(prev => ({
                         ...prev,
-                        [data.from]: (prev[data.from] || 0) + 1
+                        [from]: (prev[from] || 0) + 1
                     }));
                 }
             });
@@ -94,7 +96,10 @@ export const ChatProvider = ({ children }) => {
         });
         const data = await res.json();
         const counts = {};
-        data.forEach(u => counts[u.user] = u.count);
+        data.forEach(u => {
+            const email = (u.user || u.User).toLowerCase();
+            counts[email] = u.count || u.Count;
+        });
         setUnreadCounts(counts);
     };
 

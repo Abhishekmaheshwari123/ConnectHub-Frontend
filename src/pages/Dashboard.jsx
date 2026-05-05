@@ -48,7 +48,7 @@ const Dashboard = () => {
             <div className="sidebar">
                 <div className="sidebar-header">
                     <div className="user-profile">
-                        <div className="avatar">{user?.email[0].toUpperCase()}</div>
+                        <div className="avatar">{user?.email?.[0]?.toUpperCase() || '?'}</div>
                     </div>
                     <div className="actions">
                         <button onClick={logout} className="icon-btn"><LogOut size={20} /></button>
@@ -65,14 +65,14 @@ const Dashboard = () => {
                 <div className="chat-list">
                     {conversations.map(c => (
                         <div 
-                            key={c.User} 
-                            className={`chat-item ${activePartner === c.User ? 'active' : ''}`}
-                            onClick={() => setActivePartner(c.User)}
+                            key={c.User || c.user} 
+                            className={`chat-item ${activePartner === (c.User || c.user) ? 'active' : ''}`}
+                            onClick={() => setActivePartner(c.User || c.user)}
                         >
-                            <div className="avatar small">{c.User[0].toUpperCase()}</div>
+                            <div className="avatar small">{(c.User || c.user)?.[0]?.toUpperCase() || '?'}</div>
                             <div className="chat-item-info">
-                                <span className="chat-item-name">{c.User}</span>
-                                <span className="chat-item-last-msg">{c.LastMessage || 'No messages yet'}</span>
+                                <span className="chat-item-name">{c.User || c.user}</span>
+                                <span className="chat-item-last-msg">{c.LastMessage || c.lastMessage || 'No messages yet'}</span>
                             </div>
                             {unreadCounts[c.User] > 0 && (
                                 <span className="badge">{unreadCounts[c.User]}</span>
@@ -87,7 +87,7 @@ const Dashboard = () => {
                 {activePartner ? (
                     <>
                         <div className="chat-header">
-                            <div className="avatar small">{activePartner[0].toUpperCase()}</div>
+                            <div className="avatar small">{activePartner?.[0]?.toUpperCase() || '?'}</div>
                             <div style={{ marginLeft: '15px' }}>
                                 <span style={{ fontWeight: 500 }}>{activePartner}</span>
                             </div>

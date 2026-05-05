@@ -1,23 +1,16 @@
-# ConnectHub - Frontend
+# React + Vite
 
-Welcome to the frontend of **ConnectHub**, a real-time chat application. This repository contains the client-side code, providing a modern and responsive user interface for seamless communication.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🚀 Technologies Used
-- **React**: Modern UI library for building dynamic components.
-- **Vite**: Ultra-fast build tool and development server.
-- **SignalR Client**: Real-time communication with the backend.
-- **Tailwind CSS**: Utility-first CSS framework for sleek designs.
+Currently, two official plugins are available:
 
-## 🛠️ Getting Started
-1. Clone the repository.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## 🔗 Backend Repository
-The backend for this project can be found at [Real_Time_Chat_Application](https://github.com/Abhishekmaheshwari123/Real_Time_Chat_Application).
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

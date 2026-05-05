@@ -22,7 +22,7 @@ const Login = () => {
             });
             google.accounts.id.renderButton(
                 document.getElementById("googleBtn"),
-                { theme: "outline", size: "large", width: "100%" }
+                { theme: "outline", size: "large", width: 350 } // Numeric width in pixels
             );
         }
     }, [isRegister]);
@@ -122,7 +122,7 @@ const Login = () => {
                 </div>
 
                 {/* Google Sign-In Button Container */}
-                <div id="googleBtn" style={{ width: '100%' }}></div>
+                <div id="googleBtn" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}></div>
 
                 <p className="toggle-text">
                     {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}

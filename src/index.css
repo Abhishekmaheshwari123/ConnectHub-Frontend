@@ -274,3 +274,28 @@ body {
 .empty-chat h2 { color: #41525d; font-weight: 300; font-size: 32px; margin-bottom: 10px; }
 .empty-chat p { color: #667781; font-size: 14px; }
 .send-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+.subtitle { color: #667781; margin-bottom: 20px; font-size: 14px; }
+.main-btn { margin-top: 10px; }
+.divider { margin: 20px 0; position: relative; text-align: center; }
+.divider::before { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #eee; z-index: 1; }
+.divider span { background: white; padding: 0 10px; color: #999; font-size: 12px; position: relative; z-index: 2; }
+.google-btn {
+    width: 100%;
+    padding: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #444;
+    transition: background 0.2s;
+}
+.google-btn:hover { background: #f8f9fa; }
+.toggle-text { margin-top: 20px; font-size: 14px; color: #667781; }
+.toggle-text span { color: #00a884; font-weight: bold; cursor: pointer; }
+.toggle-text span:hover { text-decoration: underline; }

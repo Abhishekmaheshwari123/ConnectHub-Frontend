@@ -99,13 +99,13 @@ const Dashboard = () => {
                                 lastDate = currentDate;
                                 
                                 return (
-                                    <React.Fragment key={m.id || i}>
+                                        <React.Fragment key={m.id || i}>
                                         {showDivider && <div className="date-divider">{currentDate}</div>}
-                                        <div className={`message ${ (m.sender || m.Sender) === user.email ? 'sent' : 'received'}`}>
+                                        <div className={`message ${ (m.sender || m.Sender) === user?.email ? 'sent' : 'received'}`}>
                                             <div>{m.message || m.content || m.Content}</div>
                                             <div className="message-footer">
                                                 <span>{new Date(m.sentAt || m.SentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                {(m.sender || m.Sender) === user.email && (
+                                                {(m.sender || m.Sender) === user?.email && (
                                                     <span className={`tick ${(m.status || m.Status) === 'Seen' ? 'seen' : ''}`}>
                                                         {(m.status || m.Status) === 'Sent' ? '✓' : '✓✓'}
                                                     </span>

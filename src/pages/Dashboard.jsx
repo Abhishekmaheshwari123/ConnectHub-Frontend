@@ -56,29 +56,50 @@ const Dashboard = () => {
                 </div>
                 <div className="search-bar">
                     <input 
-                        placeholder="Search or start new chat" 
+                        placeholder="Search by Email (Press Enter)" 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && searchTerm && setActivePartner(searchTerm)}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter' && searchTerm) {
+                                setActivePartner(searchTerm.toLowerCase().trim());
+                                setSearchTerm(''); // Clear search after hitting enter
+                            }
+                        }}
                     />
                 </div>
                 <div className="chat-list">
-                    {conversations.map(c => (
-                        <div 
-                            key={c.User || c.user} 
-                            className={`chat-item ${activePartner === (c.User || c.user) ? 'active' : ''}`}
-                            onClick={() => setActivePartner(c.User || c.user)}
-                        >
-                            <div className="avatar small">{(c.User || c.user)?.[0]?.toUpperCase() || '?'}</div>
+                    {/* Show search result if not in conversations */}
+                    {activePartner && !conversations.some(c => (c.User || c.user).toLowerCase() === activePartner.toLowerCase()) && (
+                        <div className="chat-item active">
+                            <div className="avatar small">{activePartner[0]?.toUpperCase()}</div>
                             <div className="chat-item-info">
-                                <span className="chat-item-name">{c.User || c.user}</span>
-                                <span className="chat-item-last-msg">{c.LastMessage || c.lastMessage || 'No messages yet'}</span>
+                                <span className="chat-item-name">{activePartner}</span>
+                                <span className="chat-item-last-msg">New Conversation</span>
                             </div>
-                            {unreadCounts[c.User] > 0 && (
-                                <span className="badge">{unreadCounts[c.User]}</span>
-                            )}
                         </div>
-                    ))}
+                    )}
+
+                    {conversations.map(c => {
+                        const partnerEmail = (c.User || c.user).toLowerCase();
+                        const isActive = activePartner?.toLowerCase() === partnerEmail;
+                        
+                        return (
+                            <div 
+                                key={partnerEmail} 
+                                className={`chat-item ${isActive ? 'active' : ''}`}
+                                onClick={() => setActivePartner(partnerEmail)}
+                            >
+                                <div className="avatar small">{partnerEmail[0]?.toUpperCase() || '?'}</div>
+                                <div className="chat-item-info">
+                                    <span className="chat-item-name">{partnerEmail}</span>
+                                    <span className="chat-item-last-msg">{c.LastMessage || c.lastMessage || 'No messages yet'}</span>
+                                </div>
+                                {unreadCounts[c.User] > 0 && (
+                                    <span className="badge">{unreadCounts[c.User]}</span>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -101,11 +122,11 @@ const Dashboard = () => {
                                 return (
                                         <React.Fragment key={m.id || i}>
                                         {showDivider && <div className="date-divider">{currentDate}</div>}
-                                        <div className={`message ${(m.sender || m.Sender) === user?.email ? 'sent' : 'received'}`}>
+                                        <div className={`message ${( (m.sender || m.Sender)?.toLowerCase() === user?.email?.toLowerCase() ) ? 'sent' : 'received'}`}>
                                             <div>{m.message || m.content || m.Content}</div>
                                             <div className="message-footer">
-                                                <span>{new Date(m.sentAt || m.SentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                {(m.sender || m.Sender) === user?.email && (
+                                                <span>{new Date(m.sentAt || m.SentAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                {( (m.sender || m.Sender)?.toLowerCase() === user?.email?.toLowerCase() ) && (
                                                     <span className={`tick ${((m.status || m.Status) || '').toLowerCase() === 'seen' ? 'seen' : ''}`}>
                                                         {((m.status || m.Status) || '').toLowerCase() === 'sent' ? '✓' : '✓✓'}
                                                     </span>

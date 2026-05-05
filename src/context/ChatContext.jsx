@@ -36,11 +36,12 @@ export const ChatProvider = ({ children }) => {
                 .catch(err => console.error("SignalR Connection Error: ", err));
 
             connection.on("ReceiveMessage", (data) => {
-                const sender = data.sender || data.Sender;
-                const receiver = data.receiver || data.Receiver;
-                const partner = (sender === user.email) ? receiver : sender;
+                const sender = (data.sender || data.Sender).toLowerCase();
+                const receiver = (data.receiver || data.Receiver).toLowerCase();
+                const myEmail = user.email.toLowerCase();
+                const partner = (sender === myEmail) ? receiver : sender;
 
-                if (partner === activePartner) {
+                if (partner === activePartner?.toLowerCase()) {
                     setMessages(prev => {
                         // Avoid double messages
                         const exists = prev.some(m => m.id === data.id);

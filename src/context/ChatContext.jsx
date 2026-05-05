@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { useAuth } from './AuthContext';
 
@@ -11,20 +11,25 @@ export const ChatProvider = ({ children }) => {
     const [messages, setMessages] = useState([]);
     const [activePartner, setActivePartner] = useState(null);
     const [unreadCounts, setUnreadCounts] = useState({});
+    
+    // Use a ref for activePartner so listeners can see the latest value without re-binding
+    const activePartnerRef = useRef(activePartner);
+    useEffect(() => { activePartnerRef.current = activePartner; }, [activePartner]);
 
+    // 1. Initialize Connection
     useEffect(() => {
         if (token) {
             const newConnection = new signalR.HubConnectionBuilder()
                 .withUrl("http://localhost:5262/chatHub", { accessTokenFactory: () => token })
                 .withAutomaticReconnect()
                 .build();
-
             setConnection(newConnection);
         } else {
             setConnection(null);
         }
     }, [token]);
 
+    // 2. Start Connection and Setup Listeners
     useEffect(() => {
         if (connection) {
             connection.start()
@@ -38,22 +43,19 @@ export const ChatProvider = ({ children }) => {
             connection.on("ReceiveMessage", (data) => {
                 const sender = (data.sender || data.Sender).toLowerCase();
                 const receiver = (data.receiver || data.Receiver).toLowerCase();
-                const myEmail = user.email.toLowerCase();
+                const myEmail = user?.email?.toLowerCase();
                 const partner = (sender === myEmail) ? receiver : sender;
 
-                if (partner === activePartner?.toLowerCase()) {
+                if (partner === activePartnerRef.current?.toLowerCase()) {
                     setMessages(prev => {
-                        // Avoid double messages
-                        const exists = prev.some(m => m.id === data.id);
+                        const exists = prev.some(m => (m.id || m.Id) === (data.id || data.Id));
                         if (exists) return prev;
                         return [...prev, data];
                     });
-                    
-                    if (sender !== user.email) {
+                    if (sender !== myEmail) {
                         connection.invoke("MarkAsSeen", sender);
                     }
                 }
-                
                 fetchConversations();
             });
 
@@ -68,7 +70,7 @@ export const ChatProvider = ({ children }) => {
 
             connection.on("ReceiveNotification", (data) => {
                 const from = (data.from || data.From).toLowerCase();
-                if (activePartner?.toLowerCase() !== from) {
+                if (activePartnerRef.current?.toLowerCase() !== from) {
                     setUnreadCounts(prev => ({
                         ...prev,
                         [from]: (prev[from] || 0) + 1
@@ -76,34 +78,39 @@ export const ChatProvider = ({ children }) => {
                 }
             });
 
-            return () => {
-                connection.stop();
-            };
+            return () => { connection.stop(); };
         }
-    }, [connection, user?.email, activePartner]);
+    }, [connection, user?.email]); // Removed activePartner from dependencies
 
     const fetchConversations = async () => {
-        const res = await fetch("http://localhost:5262/api/chat/conversations", {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        const data = await res.json();
-        setConversations(data.sort((a, b) => new Date(b.Time) - new Date(a.Time)));
+        if (!token) return;
+        try {
+            const res = await fetch("http://localhost:5262/api/chat/conversations", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const data = await res.json();
+            setConversations(data.sort((a, b) => new Date(b.Time) - new Date(a.Time)));
+        } catch (e) {}
     };
 
     const fetchUnread = async () => {
-        const res = await fetch("http://localhost:5262/api/chat/unread", {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        const data = await res.json();
-        const counts = {};
-        data.forEach(u => {
-            const email = (u.user || u.User).toLowerCase();
-            counts[email] = u.count || u.Count;
-        });
-        setUnreadCounts(counts);
+        if (!token) return;
+        try {
+            const res = await fetch("http://localhost:5262/api/chat/unread", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const data = await res.json();
+            const counts = {};
+            data.forEach(u => {
+                const email = (u.user || u.User).toLowerCase();
+                counts[email] = u.count || u.Count;
+            });
+            setUnreadCounts(counts);
+        } catch (e) {}
     };
 
     const loadHistory = useCallback(async (email) => {
+        if (!token) return;
         const res = await fetch(`http://localhost:5262/api/chat/history/${email}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -113,7 +120,7 @@ export const ChatProvider = ({ children }) => {
         
         setUnreadCounts(prev => {
             const newCounts = { ...prev };
-            delete newCounts[email];
+            delete newCounts[email.toLowerCase()];
             return newCounts;
         });
     }, [token, connection]);

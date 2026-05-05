@@ -41,13 +41,18 @@ export const ChatProvider = ({ children }) => {
                 const partner = (sender === user.email) ? receiver : sender;
 
                 if (partner === activePartner) {
-                    setMessages(prev => [...prev, data]);
+                    setMessages(prev => {
+                        // Avoid double messages
+                        const exists = prev.some(m => m.id === data.id);
+                        if (exists) return prev;
+                        return [...prev, data];
+                    });
+                    
                     if (sender !== user.email) {
                         connection.invoke("MarkAsSeen", sender);
                     }
                 }
                 
-                // Update conversation list
                 fetchConversations();
             });
 

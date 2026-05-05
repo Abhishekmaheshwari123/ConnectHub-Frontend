@@ -178,14 +178,8 @@ body {
   color: var(--text-muted);
 }
 
-.tick {
-  margin-left: 4px;
-  font-size: 14px;
-}
-
-.tick.seen {
-  color: #53bdeb;
-}
+.tick { font-size: 14px; color: #8696a0; margin-left: 4px; display: inline-block; }
+.tick.seen { color: #53bdeb; } /* Vibrant WhatsApp blue */
 
 .input-container {
   padding: 10px 16px;
